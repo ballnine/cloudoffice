@@ -15,6 +15,11 @@
             "type":["Personal"]
         }
     },
+    "listPersonalFileInfo":{
+        "validator":{
+            "type":["Personal"]
+        }
+    },
     "deletePersonalFile":{
         "validator":{
             "type":["Personal"]

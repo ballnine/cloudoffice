@@ -74,4 +74,29 @@ public class SSHUtil {
 		SFTPv3Client sftpClient = new SFTPv3Client(conn);
 		sftpClient.rm(path);
 	}
+	
+	/**
+	 *实现上传服务器上的文件夹
+	 * @param conn SSH连接信息
+	 * @param fileName 服务器上的文件夹地址/opt/scf2/log/loanorder/all.log
+	 * @throws IOException
+	 */
+	public static void putDir(Connection conn, String fileName) throws IOException{
+		SFTPv3Client sftpClient = new SFTPv3Client(conn);
+		sftpClient.mkdir(fileName, 777);
+	}
+	
+	/**
+	 *实现服务器文件的重命名
+	 * @param conn SSH连接信息
+	 * @param oldPath 服务器上的原文件地址/opt/scf2/log/loanorder/all.log
+	 * @param newPath 服务器上的新文件名
+	 * @throws IOException
+	 */
+	public static void renameFile(Connection conn, String oldPath, String newPath) throws IOException{
+		
+		SFTPv3Client sftpClient = new SFTPv3Client(conn);
+		sftpClient.mv(oldPath, newPath);
+		
+	}
 }

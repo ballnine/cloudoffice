@@ -95,15 +95,17 @@ public class PersonalFileController {
 	
 	@RequestMapping("/addPersonalFolder")
 	@ResponseBody
-	public String createPersonalFolder(HttpServletRequest request, HttpServletResponse response) {
+	public DataOutputFormat createPersonalFolder(HttpServletRequest request, HttpServletResponse response) {
 		int user = Integer.parseInt(request.getParameter("id"));
 		String parentId = request.getParameter("parentId");
+		String fileName = request.getParameter("fileName");
 		JSONObject parameters = new JSONObject();
+		parameters.put("fileName", fileName);
 		parameters.put("empeeAcct", user);
 		parameters.put("parentId", parentId);
-		JSONObject result = personalFileService.createPersonalFolder(parameters,request);
+		DataOutputFormat result = personalFileService.createPersonalFolder(parameters,request);
 		String message = result.toString();
-		return message;
+		return result;
 	}
 	
 	@RequestMapping("/listRecycler")
@@ -149,7 +151,7 @@ public class PersonalFileController {
 	
 	@RequestMapping("/renamePersonalFile")
 	@ResponseBody
-	public String renameFile(HttpServletRequest request, HttpServletResponse response) {
+	public DataOutputFormat renameFile(HttpServletRequest request, HttpServletResponse response) {
 		int user = Integer.parseInt(request.getParameter("id"));
 		String fileId = request.getParameter("fileId");
 		String fileName = request.getParameter("fileName");
@@ -157,9 +159,9 @@ public class PersonalFileController {
 		parameters.put("empeeAcct", user);
 		parameters.put("fileId", fileId);
 		parameters.put("fileName", fileName);
-		JSONObject result = personalFileService.renameFile(parameters,request);
+		DataOutputFormat result = personalFileService.renameFile(parameters,request);
 		String message = result.toString();
-		return message;
+		return result;
 	}
 	
 	@RequestMapping("/testAction")

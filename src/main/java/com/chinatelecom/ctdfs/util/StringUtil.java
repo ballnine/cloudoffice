@@ -61,4 +61,17 @@ public class StringUtil {
 		}
 		return list;
 	}
+	
+	/**
+	 * 年月日转换成字符串
+	 * 
+	 * @param date
+	 * @return str
+	 */
+	public static String dayToStr(Date date) {
+
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+		String str = format.format(date);
+		return str;
+	}
 }

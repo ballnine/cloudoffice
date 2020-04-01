@@ -108,7 +108,7 @@ public class PersonalFileService implements IWorkService{
 				paraMap.put("fileId", parentId);
 				HashMap<String, Object> parentFile = personalFileMapper.getFileInfoById(paraMap);
 				remoteContent = parentFile.get("FILE_SYS").toString();
-				relativeContent = parentFile.get("FILE_PATH") + File.separator + parentFile.get("FILE_NAME");
+				relativeContent = parentFile.get("FILE_PATH") + File.separator + parentFile.get("FILE_DFSNAME");
 			}
 			String fileName = new String(parameters.getString("fileName").getBytes("iso8859-1"),"UTF-8");
 			//TODO:文件名合法判断
@@ -126,7 +126,7 @@ public class PersonalFileService implements IWorkService{
 			if (relativeContent.length() > 2) {
 				localPath = savePath+File.separator+userId+File.separator+relativeContent.substring(2)+File.separator+fileName;
 			}
-			File files = new File(localPath);
+			File files = new File(savePath+File.separator+userId);
 			if(!files.exists()&&!files.isDirectory()){
 			    files.mkdir();
 			}
@@ -138,7 +138,7 @@ public class PersonalFileService implements IWorkService{
 			fileInfo.put("status", 1);
 			fileInfo.put("path", remotePath);
 			fileInfo.put("sizes", file.getSize());
-			fileInfo.put("dfsFileName", "temp");
+			fileInfo.put("dfsFileName", fileName);
 			fileInfo.put("class", 1);
 			fileInfo.put("content",relativeContent);
 			fileInfo.put("empeeAcct", userId);
@@ -245,7 +245,10 @@ public class PersonalFileService implements IWorkService{
 		try {
 			int id = parameters.getInt("empeeAcct");
 			String parentId = parameters.getString("parentId");
-			String fileName = parameters.getString("fileName");
+			String fileName = new String(parameters.getString("fileName").getBytes("iso8859-1"),"UTF-8");
+			String dfsName = StringUtil.dayToStr(new Date()) + fileName;
+			String remoteContent = "/home/disk/public/files/personal/" + id;
+			String relativeContent = "~";
 			HashMap<String, Object> loginInfo=commonService.getUserInfoById(id);
 			if(loginInfo == null) {
 				resultJson.put(RetCode.RESULT_KEY, RetCode.ERROR_CODE_11);
@@ -260,11 +263,9 @@ public class PersonalFileService implements IWorkService{
 	            paraMap.put("ownerId", id);
 	            HashMap<String, Object> fileInfo = new HashMap<String, Object>();
 	            fileInfo = personalFileMapper.getFileInfoById(paraMap);
-	            if (!parentId.equals("~") && fileInfo == null) {
-	            	resultJson.put(RetCode.RESULT_KEY, RetCode.ERROR_CODE_19);
-	    			resultJson.put(RetCode.RESULT_VALUE,RetCode.ERROR_DESC_19);
-	                result.setJSON(resultJson);
-	                return result;
+	            if(!parentId.equals(String.valueOf(id))) {
+	            	remoteContent = fileInfo.get("FILE_SYS").toString();
+					relativeContent = fileInfo.get("FILE_PATH") + File.separator + fileInfo.get("FILE_DFSNAME");
 	            }
 	            //TODO:新建文件夹重名
 	            if(repeatName(fileName,parentId,id)) {
@@ -273,6 +274,15 @@ public class PersonalFileService implements IWorkService{
     				result.setJSON(resultJson);
     				return result;
             	}
+	            String remotePath = remoteContent + "/" + dfsName;
+				String localPath = savePath+File.separator+id+File.separator+dfsName;
+				if (relativeContent.length() > 2) {
+					localPath = savePath+File.separator+id+File.separator+relativeContent.substring(2)+File.separator+dfsName;
+				}
+				File files = new File(localPath);
+				if(!files.exists()&&!files.isDirectory()){
+				    files.mkdir();
+				}
 	            fileInfo = new HashMap<String, Object>();
 	            String ID = UUID.randomUUID().toString().replace("-", "").toUpperCase();
 				fileInfo.put("ID", ID);
@@ -283,13 +293,16 @@ public class PersonalFileService implements IWorkService{
 				fileInfo.put("createTime", StringUtil.dateToStr(new Date()));
 				fileInfo.put("modificationTime", StringUtil.dateToStr(new Date()));
 				fileInfo.put("status", 1);
-				fileInfo.put("path", "c:\\test");
+				fileInfo.put("path", remotePath);
 				fileInfo.put("sizes", 0);
-				fileInfo.put("dfsFileName", "temp");
+				fileInfo.put("dfsFileName", dfsName);
 				fileInfo.put("class", 2);
-				fileInfo.put("content", "/");
+				fileInfo.put("content", relativeContent);
 				int num = personalFileMapper.addPersonalFile(fileInfo);
 	            if (num > 0) {
+	            	Connection conn = SSHUtil.getSSHConnection("122.51.38.46",22,"root","Hudiewang$0","C:\\study\\rsy");
+    				SSHUtil.putDir(conn, remotePath);
+    				conn.close();  
 	            	resultJson.put(RetCode.RESULT_KEY, RetCode.SUCCESS);
 	    			resultJson.put(RetCode.RESULT_VALUE,RetCode.SUCCESS_MSG);
 	                result.setJSON(resultJson);
@@ -737,50 +750,73 @@ public class PersonalFileService implements IWorkService{
 	 * @return
 	 */
 	@MatchMethod(matchPostfix = "login")
-	public JSONObject renameFile(JSONObject parameters, HttpServletRequest request) {
+	public DataOutputFormat renameFile(JSONObject parameters, HttpServletRequest request) {
 		DataOutputFormat result = new DataOutputFormat();
 		JSONObject resultJson = new JSONObject();
 		try {
 			int id = parameters.getInt("empeeAcct");
 		    String fileId = parameters.getString("fileId");
-		    String fileName = parameters.getString("fileName");
+		    String fileName = new String(parameters.getString("fileName").getBytes("iso8859-1"),"UTF-8");
 		    int flag = 0;
+		    String fileSys = "";
 			HashMap<String, Object> loginInfo=commonService.getUserInfoById(id);
 			if(loginInfo == null) {
 				resultJson.put(RetCode.RESULT_KEY, RetCode.ERROR_CODE_11);
 				resultJson.put(RetCode.RESULT_VALUE,RetCode.ERROR_DESC_11);
 				result.setJSON(resultJson);
-				return resultJson;
+				return result;
 			}		
 			
 			if(!fileId.isEmpty()) {
 				HashMap<String, Object> paraMap = new HashMap<String, Object>();
 	            paraMap.put("fileId", fileId);
+	            paraMap.put("ownerId", id);
+	            HashMap<String, Object> fileInfo = personalFileMapper.getFileInfoById(paraMap);
+	            if (repeatName(fileName,fileInfo.get("FILE_PARENT").toString(),id)) {
+	            	resultJson.put(RetCode.RESULT_KEY, RetCode.ERROR_CODE_20);
+					resultJson.put(RetCode.RESULT_VALUE, RetCode.ERROR_DESC_20);
+					result.setJSON(resultJson);
+					return result;
+	            }
 	            paraMap.put("fileName", fileName);
+	            paraMap.put("updateTime", StringUtil.dateToStr(new Date()));
+	            if (fileInfo.get("FILE_TYPE") != null) {
+	            	flag = 1;
+	            	fileSys = fileInfo.get("FILE_SYS").toString();
+	            	fileSys = fileSys.substring(0,fileSys.lastIndexOf("/")+1) + fileName;
+	            	paraMap.put("fileSys", fileSys);
+	            	paraMap.put("type", fileName.substring(fileName.lastIndexOf(".")+1));
+	            	paraMap.put("dfsName", fileName);
+	            }
 	            int count = personalFileMapper.updateFileName(paraMap);
 	            if (count > 0) {
+	            	if (flag == 1) {
+	            		Connection conn = SSHUtil.getSSHConnection("122.51.38.46",22,"root","Hudiewang$0","C:\\study\\rsy");
+						SSHUtil.renameFile(conn, fileInfo.get("FILE_SYS").toString(), fileSys);
+						conn.close();
+	            	}
 	            	resultJson.put(RetCode.RESULT_KEY, RetCode.SUCCESS);
 	    			resultJson.put(RetCode.RESULT_VALUE,RetCode.SUCCESS_MSG);
 	                result.setJSON(resultJson);
-	                return resultJson;
+	                return result;
 	            }
 			} else {
 				resultJson.put(RetCode.RESULT_KEY, RetCode.ERROR_CODE_12);
 				resultJson.put(RetCode.RESULT_VALUE,RetCode.ERROR_DESC_12);
 				result.setJSON(resultJson);
-				return resultJson;
+				return result;
 			}
 		} catch (Exception e) {
 			resultJson.put(RetCode.RESULT_KEY, RetCode.FAIL);
 			resultJson.put(RetCode.RESULT_VALUE, RetCode.FAIL_MSG + e.getMessage());
 			result.setJSON(resultJson);
 			log.error(e.getMessage(), e);
-			return resultJson;
+			return result;
 		}
 		resultJson.put(RetCode.RESULT_KEY, RetCode.FAIL);
 		resultJson.put(RetCode.RESULT_VALUE, RetCode.FAIL_MSG);
 		result.setJSON(resultJson);
-		return resultJson;
+		return result;
 	}
 	
 	private boolean repeatName(String fileName, String parentId, int userId) {

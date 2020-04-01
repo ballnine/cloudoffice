@@ -1,3 +1,5 @@
+## 通用
+
 权限错误返回
 ```
 {
@@ -164,7 +166,7 @@ url:"/downloadPersonalFile"
 ```
 {
   "id":8556016,
-  "fileId":"4ADC9FDF8B0646B292CC409C82637C53",
+  "fileId":"5ABFF5F0E0944835ADC3F1DAEC9AA394",
   "path":"C:\百度网盘"
 }
 ```
@@ -205,6 +207,100 @@ url:"/listPersonalFileInfo"
 ```
 {
   "id":8556016,
-  "fileId":"4ADC9FDF8B0646B292CC409C82637C53"
+  "fileId":"5ABFF5F0E0944835ADC3F1DAEC9AA394"
+}
+```
+
+5、新建文件夹
+
+url:"/addPersonalFolder"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+  "parentId":string   //父文件id
+  "fileName":string   //新建文件夹名
+}
+```
+
+**出参**
+
+正常：
+```
+{
+  "content": "{
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"
+  }",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+目标文件夹已有同名文件：
+```
+{
+  "content":"{
+     \"retCode\":\"20\",
+     \"retMsg\":\"目标文件重名\"
+  }"
+}
+```
+
+**测试数据**
+```
+{
+  "id":8556016,
+  "parentId":"8556016",
+  "fileName":"新建文件夹"
+}
+```
+
+6、文件重命名
+
+url:"/renamePersonalFile"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+  "fileId":string   //文件id
+  "fileName":string   //文件重命名
+}
+```
+
+**出参**
+
+正常：
+```
+{
+  "content": "{
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"
+  }",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+目标文件夹已有同名文件：
+```
+{
+  "content":"{
+     \"retCode\":\"20\",
+     \"retMsg\":\"目标文件重名\"
+  }"
+}
+```
+
+**测试数据**
+```
+{
+  "id":8556016,
+  "fileId":"6D73EFB450BB4F3E9B2C50D3D330F007",
+  "fileName":"rename.pdf"
 }
 ```

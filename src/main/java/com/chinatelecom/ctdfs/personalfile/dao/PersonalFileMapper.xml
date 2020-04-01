@@ -117,8 +117,19 @@
 	</delete>
 	
 	<update id="updateFileName" parameterType="java.util.HashMap" >
-	   update CTDFS_FILEINFO set FILE_NAME=#{fileName}
-	   where file_id=#{fileId}
+	   update CTDFS_FILEINFO t set 
+	   <if test="fileSys !=null and fileSys.length() > 0">
+			t.FILE_SYS=#{fileSys},
+	   </if>
+	   <if test="type !=null and type.length() > 0">
+			t.FILE_TYPE=#{type},
+	   </if>
+	   <if test="dfsName !=null and dfsName.length() > 0">
+			t.FILE_DFSNAME=#{dfsName},
+	   </if>
+	   t.FILE_NAME=#{fileName},
+	   t.FILE_MODIFICATION_DATE=#{updateTime}
+	   where t.file_id=#{fileId}
 	</update>
 	
 	<select id="getInfoById" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
