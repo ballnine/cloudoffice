@@ -75,10 +75,6 @@ public class PersonalFileService implements IWorkService{
 		DataOutputFormat result = new DataOutputFormat();
 		JSONObject resultJson = new JSONObject();
 		try {
-		    File files = new File(savePath);
-		    if(!files.exists()&&!files.isDirectory()){
-		        files.mkdir();
-		    }
 		    List<HashMap<String, Object>> personalFile = new ArrayList<HashMap<String, Object>>();
 		    HashMap<String, Object> fileInfo = new HashMap<String, Object>();
 		    MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request; 
@@ -115,7 +111,6 @@ public class PersonalFileService implements IWorkService{
 				relativeContent = parentFile.get("FILE_PATH") + File.separator + parentFile.get("FILE_NAME");
 			}
 			String fileName = new String(parameters.getString("fileName").getBytes("iso8859-1"),"UTF-8");
-			System.out.println(fileName);
 			//TODO:文件名合法判断
 			fileName = fileName.substring(fileName.lastIndexOf(File.separator)+1);
 			if(repeatName(fileName,parentId,userId)) {
@@ -130,6 +125,10 @@ public class PersonalFileService implements IWorkService{
 			String localPath = savePath+File.separator+userId+File.separator+fileName;
 			if (relativeContent.length() > 2) {
 				localPath = savePath+File.separator+userId+File.separator+relativeContent.substring(2)+File.separator+fileName;
+			}
+			File files = new File(localPath);
+			if(!files.exists()&&!files.isDirectory()){
+			    files.mkdir();
 			}
 			fileInfo.put("ID", ID);
 			fileInfo.put("name", fileName);
@@ -240,18 +239,19 @@ public class PersonalFileService implements IWorkService{
 	 * @return
 	 */
 	@MatchMethod(matchPostfix = "login")
-	public JSONObject createPersonalFolder(JSONObject parameters, HttpServletRequest request) {
+	public DataOutputFormat createPersonalFolder(JSONObject parameters, HttpServletRequest request) {
 		DataOutputFormat result = new DataOutputFormat();
 		JSONObject resultJson = new JSONObject();
 		try {
 			int id = parameters.getInt("empeeAcct");
 			String parentId = parameters.getString("parentId");
+			String fileName = parameters.getString("fileName");
 			HashMap<String, Object> loginInfo=commonService.getUserInfoById(id);
 			if(loginInfo == null) {
 				resultJson.put(RetCode.RESULT_KEY, RetCode.ERROR_CODE_11);
 				resultJson.put(RetCode.RESULT_VALUE,RetCode.ERROR_DESC_11);
 				result.setJSON(resultJson);
-				return resultJson;
+				return result;
 			}
 		
 			if(!parentId.isEmpty()) {
@@ -264,27 +264,27 @@ public class PersonalFileService implements IWorkService{
 	            	resultJson.put(RetCode.RESULT_KEY, RetCode.ERROR_CODE_19);
 	    			resultJson.put(RetCode.RESULT_VALUE,RetCode.ERROR_DESC_19);
 	                result.setJSON(resultJson);
-	                return resultJson;
+	                return result;
 	            }
 	            //TODO:新建文件夹重名
-	            if(repeatName("新建文件夹",parentId,id)) {
+	            if(repeatName(fileName,parentId,id)) {
             		resultJson.put(RetCode.RESULT_KEY, RetCode.ERROR_CODE_20);
     				resultJson.put(RetCode.RESULT_VALUE, RetCode.ERROR_DESC_20);
     				result.setJSON(resultJson);
-    				return resultJson;
+    				return result;
             	}
 	            fileInfo = new HashMap<String, Object>();
 	            String ID = UUID.randomUUID().toString().replace("-", "").toUpperCase();
 				fileInfo.put("ID", ID);
 				fileInfo.put("empeeAcct", id);
-				fileInfo.put("name", "新建文件夹");
+				fileInfo.put("name", fileName);
 	            fileInfo.put("parentId", parentId);
 				fileInfo.put("type", "");
 				fileInfo.put("createTime", StringUtil.dateToStr(new Date()));
 				fileInfo.put("modificationTime", StringUtil.dateToStr(new Date()));
 				fileInfo.put("status", 1);
 				fileInfo.put("path", "c:\\test");
-				fileInfo.put("size", 0);
+				fileInfo.put("sizes", 0);
 				fileInfo.put("dfsFileName", "temp");
 				fileInfo.put("class", 2);
 				fileInfo.put("content", "/");
@@ -293,25 +293,25 @@ public class PersonalFileService implements IWorkService{
 	            	resultJson.put(RetCode.RESULT_KEY, RetCode.SUCCESS);
 	    			resultJson.put(RetCode.RESULT_VALUE,RetCode.SUCCESS_MSG);
 	                result.setJSON(resultJson);
-	                return resultJson;
+	                return result;
 	            }
 			} else {
 				resultJson.put(RetCode.RESULT_KEY, RetCode.ERROR_CODE_12);
 				resultJson.put(RetCode.RESULT_VALUE,RetCode.ERROR_DESC_12);
 				result.setJSON(resultJson);
-				return resultJson;
+				return result;
 			}
 		} catch (Exception e) {
 			resultJson.put(RetCode.RESULT_KEY, RetCode.FAIL);
 			resultJson.put(RetCode.RESULT_VALUE, RetCode.FAIL_MSG + e.getMessage());
 			result.setJSON(resultJson);
 			log.error(e.getMessage(), e);
-			return resultJson;
+			return result;
 		}
 		resultJson.put(RetCode.RESULT_KEY, RetCode.FAIL);
 		resultJson.put(RetCode.RESULT_VALUE, RetCode.FAIL_MSG);
 		result.setJSON(resultJson);
-		return resultJson;
+		return result;
 	}
 	
 	/**
