@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinatelecom.ctdfs.personalfile.mapper.personalFileMapper" >
+	<insert id="addPersonalFile" parameterType="java.util.List">
+        insert into PERSONAL_FILE ( file_id,
+        							file_name,
+        							file_sys,
+            						file_parent,
+            						file_owner,
+            						file_size,
+									file_creation_date,
+									file_modification_date,
+									file_type,
+									file_status,
+									file_dfsname)
+       select A.* from(
+		<foreach collection="list" item="item" index="index" separator="union all">
+	     select #{item.ID} file_id,#{item.name} file_name,#{item.path} file_sys,
+	     #{item.parent} file_parent,#{item.empeeAcct} file_owner,#{item.size} file_size,
+	     to_date(#{createTime}, 'YYYY-MM-DD HH24:MI:SS' ) file_creation_date,
+	     to_date(#{modificationTime}, 'YYYY-MM-DD HH24:MI:SS' ) file_modification_date,
+	     #{item.type} file_type, #{item.status} file_status, #{item.dfsFileName} file_dfsname
+	     from dual
+	    </foreach>
+	    ) A
+	</insert>
+
+	<select id="getPersonalFileInfo" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select file_id,file_name,file_path,file_parent,file_size,file_creation_date,file_modification_date,file_type
+		from PERSONAL_FILE
+		where file_parent = #{parentId} and (file_status = '1' or file_status = '4')
+		order by FILE_MODIFICATION_DATE desc
+ 	</select>
+ 	
+ 	<select id="getRecycleSubFile" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select file_id,file_name,file_path,file_parent,file_size,file_creation_date,file_modification_date,file_type
+		from PERSONAL_FILE
+		where file_parent = #{parentId} and file_status != '2' and file_status != '1'
+ 	</select>
+ 	
+ 	<select id="getRecyclerFile" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select file_id,file_name,file_path,file_parent,file_size,file_creation_date,file_modification_date,file_type
+		from PERSONAL_FILE
+		where file_owner = #{ownerId} and (file_status = '2' or file_status = '4')
+ 	</select>
+ 	
+ 	<select id="getDeleteSubFile" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select file_id,file_name,file_path,file_parent,file_size,file_creation_date,file_modification_date,file_type
+		from PERSONAL_FILE
+		where file_owner = #{ownerId} and file_status = '3'
+ 	</select>
+ 	
+ 	<select id="getFileInfoById" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select file_id,file_name,file_path,file_parent,file_size,file_creation_date,file_modification_date,file_type,
+		file_dfsname,file_sys,file_status
+		from PERSONAL_FILE
+		where file_id = #{fileId} and file_owner = #{ownerId}
+ 	</select>
+ 	
+ 	<update id="updateFileStatus" parameterType="java.util.HashMap" >
+	   update PERSONAL_FILE set FILE_STATUS=#{status}
+	   where file_id=#{fileId}
+	</update>
+	
+	<select id="getParentById" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select file_parent,file_status
+		from PERSONAL_FILE
+		where file_id = #{parentId}
+ 	</select>
+ 	
+ 	<delete id="deleteFile" parameterType="java.util.HashMap">
+ 		BEGIN
+	 	<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            delete from PERSONAL_FILE p 
+            where p.file_id=#{item}
+        </foreach>
+        ;end;	
+	</delete>
+	
+	<update id="updateFileName" parameterType="java.util.HashMap" >
+	   update PERSONAL_FILE set FILE_NAME=#{fileName}
+	   where file_id=#{fileId}
+	</update>
+</mapper>

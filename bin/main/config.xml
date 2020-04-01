@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <application>
+        <name>none</name>
+        <netid>0</netid>
+        <manager>local</manager>
+    </application>
+    <manager name="local">
+       
+    </manager>
+    <manager name="server" token="HZwRet/NB7pk4+cubnMICA==">
+        	<servers>
+        	    <server address="127.0.0.1" port="7927"/>
+        	    <server address="127.0.0.1" port="7927"/>
+        	</servers>
+    </manager>
+    <custom>
+   		<item namespace="com.chinatelecom.udp.component.hadoop.HadoopFileSystem" name="hadoop"
+			 type="map">
+				<defaultFs value="hdfs://nameservice1" type="string" />
+				<nameservices value="nameservice1" type="string" />
+				<nameservice1 value="namenode581,namenode236" type="string" />
+				<nn1 value="bigdata012010:8020" type="string" />
+				<nn2 value="bigdata012011:8020" type="string" />
+				<principal value="lichao@MYCDH" type="string" />
+				<keytabPath  value="/data/gzst/apache-tomcat-8.0.39/webapps/file/WEB-INF/classes/lichao.keytab" type="string" />
+				<krc5krcPath  value="/data/gzst/apache-tomcat-8.0.39/webapps/file/WEB-INF/classes/krb5.conf"  type="string" />
+		</item>  
+    </custom>
+</config>

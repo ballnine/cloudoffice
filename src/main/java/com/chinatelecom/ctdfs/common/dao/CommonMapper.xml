@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinatelecom.ctdfs.common.mapper.CommonMapper">
+
+
+<select id="getEmpeeAcctByToken" resultType="java.util.HashMap" parameterType="java.lang.String">
+	select a.empee_acct from t_wk_user_token_info a 
+	where a.token = #{_parameter} and (a.is_valid = 1 and a.expire_time > sysdate)
+</select>	
+
+
+<select id="getEmpeeAcctByAppToken" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+	select a.empee_acct from t_wk_app_token_info a 
+	where a.APP_TOKEN = #{appToken} and (a.is_valid = 1 and a.EXPIRE_TIME > sysdate)
+	and a.APP_CODE = #{appCode}
+</select>
+
+<select id="getClientInstallFile" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+  select 
+ id,
+ install_files,
+ client_platform,
+ client_version_no,
+ ver_disc
+from(
+select 
+  a.id,
+  'https://it.jisu8.cn:9999/hfile/dget.file?id='||a.install_files install_files,
+  a.client_platform,
+  a.client_version_no,
+  a.ver_disc,
+  row_number()over(partition by a.client_platform order by a.client_version_no desc) rm
+ from t_wk_app_client_version a 
+ where a.client_id = '98237446-29fe-471c-a369-d519cd4c7df3'
+ <if test="clientPlatform != null">
+   and a.client_platform = #{clientPlatform}
+ </if>
+ and a.client_state = 1)
+ where rm = 1
+</select>
+
+
+<insert id="createLoginQrCode" parameterType="java.util.HashMap">
+	insert into t_wk_app_login_qrcode_info(
+		 id, 
+		qr_code, 
+		qr_crt_date, 
+		qr_exp_date,
+		login_flag
+	)values(
+		 #{uuid},
+		 #{qrCode},
+		 sysdate,
+		 sysdate + 2/(24*60),
+		 0
+	)
+
+</insert>	
+
+<select id="getUserById" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+	select a.* from CTDFS_USER a 
+	where a.ID = #{id}
+</select>
+
+</mapper>

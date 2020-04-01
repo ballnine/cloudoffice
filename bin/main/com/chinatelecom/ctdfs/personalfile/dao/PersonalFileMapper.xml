@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinatelecom.ctdfs.personalfile.mapper.PersonalFileMapper" >
+	<insert id="addPersonalFile-old" parameterType="java.util.HashMap">
+        insert into PERSONAL_FILE ( file_id,
+        							file_name,
+        							file_sys,
+        							file_path,
+            						file_parent,
+            						file_owner,
+            						file_size,
+									file_creation_date,
+									file_modification_date,
+									file_type,
+									file_status,
+									file_dfsname,
+									file_class)
+       select A.*,bsc_seq.nextval,sort_seq.nextval from(
+		<foreach collection="list" item="item" index="index" separator="union all">
+	     select #{item.ID} file_id,#{item.name} file_name,#{item.path} file_sys,#{item.content} file_path
+	     #{item.parent} file_parent,#{item.empeeAcct} file_owner,#{item.size} file_size,
+	     to_date(#{createTime}, 'YYYY-MM-DD HH24:MI:SS' ) file_creation_date,
+	     to_date(#{modificationTime}, 'YYYY-MM-DD HH24:MI:SS' ) file_modification_date,
+	     #{item.type} file_type, #{item.status} file_status, #{item.dfsFileName} file_dfsname,
+	     #{item.class} file_class
+	     from dual
+	    </foreach>
+	    ) A
+	</insert>
+	
+	<insert id="addPersonalFile" parameterType="java.util.HashMap">
+        insert into CTDFS_FILEINFO (file_id,
+        							file_name,
+        							file_sys,
+        							file_path,
+            						file_parent,
+            						file_owner,
+            						file_size,
+									file_creation_date,
+									file_modification_date,
+									file_type,
+									file_status,
+									file_dfsname,
+									file_class) values(
+									#{ID},
+									#{name},
+									#{path},
+									#{content},
+									#{parentId},
+									#{empeeAcct},
+									#{sizes},
+									#{createTime},
+									#{modificationTime},
+									#{type},
+									#{status},
+									#{dfsFileName},
+									#{class}
+									)
+	</insert>
+
+	<select id="getPersonalFileInfo" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select *
+		from CTDFS_FILEINFO
+		where file_parent = #{parentId} and (file_status = '1' or file_status = '4' or file_status = '5')
+		order by FILE_MODIFICATION_DATE desc
+ 	</select>
+ 	
+ 	<select id="getRecycleSubFile" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select file_id,file_name,file_parent,file_size,file_creation_date,file_modification_date,file_type
+		from CTDFS_FILEINFO
+		where file_parent = #{parentId} and file_status != '2' and file_status != '1'
+ 	</select>
+ 	
+ 	<select id="getRecyclerFile" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select file_id,file_name,file_parent,file_size,file_creation_date,file_modification_date,file_type
+		from CTDFS_FILEINFO
+		where file_owner = #{ownerId} and (file_status = '2' or file_status = '4')
+ 	</select>
+ 	
+ 	<select id="getDeleteSubFile" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select file_id,file_name,file_parent,file_size,file_creation_date,file_modification_date,file_type
+		from CTDFS_FILEINFO
+		where file_owner = #{ownerId} and file_status = '3' and file_parent = #{parentId}
+ 	</select>
+ 	
+ 	<select id="getRecycleUpFile" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select file_id,file_name,file_parent,file_size,file_creation_date,file_modification_date,file_type
+		from CTDFS_FILEINFO
+		where file_owner = #{ownerId} and file_parent = #{parentId} and (file_status = '4' or file_status = '5')
+ 	</select>
+ 	
+ 	<select id="getFileInfoById" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select *
+		from CTDFS_FILEINFO
+		where file_id = #{fileId} and file_owner = #{ownerId}
+ 	</select>
+ 	
+ 	<update id="updateFileStatus" parameterType="java.util.HashMap" >
+	   update CTDFS_FILEINFO set FILE_STATUS=#{status}
+	   where file_id=#{fileId}
+	</update>
+	
+	<select id="getParentById" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select file_parent,file_status
+		from CTDFS_FILEINFO
+		where file_id = #{parentId}
+ 	</select>
+ 	
+ 	<delete id="deleteFile" parameterType="java.util.HashMap">
+ 		BEGIN
+	 	<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            delete from CTDFS_FILEINFO p 
+            where p.file_id=#{item}
+        </foreach>
+        ;end;	
+	</delete>
+	
+	<update id="updateFileName" parameterType="java.util.HashMap" >
+	   update CTDFS_FILEINFO set FILE_NAME=#{fileName}
+	   where file_id=#{fileId}
+	</update>
+	
+	<select id="getInfoById" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select *
+		from CTDFS_USER
+		where id = #{userId}
+ 	</select>
+ 	
+ 	<select id="getFileByName" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select *
+		from CTDFS_FILEINFO
+		where file_name = #{fileName} and file_parent = #{parentId} and file_owner = #{userId}
+ 	</select>
+ 	
+ 	<select id="getAccess" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select *
+		from CTDFS_FILEINFO
+		where file_id = #{fileId} and file_owner = #{userId}
+ 	</select>
+</mapper>

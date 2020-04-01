@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <!-- 当结果集中含有Null值时是否执行映射对象的setter或者Map对象的put方法。此设置对于原始类型如int,boolean等无效。 默认值false -->
+        <setting name="callSettersOnNulls" value="true"/>
+         <setting name="logImpl" value="LOG4J2" />
+         <!--插入为空时插入空值避免报空指针-->
+		<!-- <setting name="jdbcTypeForNull" value="NULL" /> -->
+    </settings>
+</configuration>

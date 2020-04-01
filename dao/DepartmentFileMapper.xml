@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinatelecom.ctdfs.personalfile.mapper.departmentFileMapper" >
+	<select id="getInfoById" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select file_id,file_name,file_path,file_parent,file_size,file_creation_date,file_modification_date,file_type,
+		group_id,group_level
+		from DEPARTMENT_FILE
+		where file_id = #{fileId}
+ 	</select>
+ 	
+ 	<select id="getFileByParent" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select file_id,file_name,file_path,file_parent,file_size,file_creation_date,file_modification_date,file_type,
+		group_id,group_level
+		from DEPARTMENT_FILE
+		where file_parent = #{fileId}
+ 	</select>
+ 	
+ 	<select id="getAuditedInfo" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select pk_review,fk_file,file_name,review_status,review_time
+		from FILE_AUDIT
+		where fk_applicant = #{userId}
+ 	</select>
+ 	
+ 	<select id="getAuditInfo" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select pk_review,fk_file,file_name,review_status,review_time
+		from FILE_AUDIT
+		where FK_APPROVER = #{userId} order by REVIEW_TIME desc
+ 	</select>
+ 	
+ 	<update id="updateState" parameterType="java.util.HashMap" >
+	   update FILE_AUDIT set REVIEW_STATUS=#{state}
+	   where PK_REVIEW=#{reviewId} and REVIEW_STATUS=0
+	</update>
+	
+	<select id="getRelationByUser" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select PERMISSION_LEVEL
+		from USER_FILE
+		where FK_FILE = #{fileId} ane FK_USER = #{ownerId}
+ 	</select>
+ 	
+ 	<select id="getRelationByGroup" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select PERMISSION_LEVEL
+		from GROUP_FILE
+		where FK_FILE = #{fileGroupId} and FK_USER in
+		(select DEPARTMENT_ID from department where staff_id = #{ownerId})
+		FK_USER = #{ownerId}
+ 	</select>
+
+</mapper>

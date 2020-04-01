@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinatelecom.ctdfs.departmentfile.mapper.DepartmentFileMapper" >
+	<insert id="addOrgFile" parameterType="java.util.HashMap">
+        insert into CTDFS_ORG_FILE ( file_id,
+        							file_name,
+        							file_sys,
+        							file_path,
+            						file_parent,
+            						file_owner,
+            						file_size,
+									file_creation_date,
+									file_modification_date,
+									file_type,
+									file_status,
+									file_dfsname,
+									file_class,
+									group_id,
+									group_level,
+									org_id) values(
+									#{ID},
+									#{name},
+									#{path},
+									#{content},
+									#{parentId},
+									#{empeeAcct},
+									#{size},
+									#{createTime},
+									#{modificationTime},
+									#{type},
+									#{status},
+									#{dfsFileName},
+									#{class},
+									#{groupId},
+									#{groupLevel},
+									#{orgId}
+									)
+	</insert>
+	
+	<insert id="addAuditFile" parameterType="java.util.HashMap">
+        insert into CTDFS_AUDIT ( audit_id,
+        						  fk_applicant,
+        						  applicant_name,
+        						  fk_file,
+            					  file_name,
+            					  fk_path,
+            					  path_name,
+            					  fk_approver,
+            					  review_status,
+            					  review_time) values(
+								  #{id},
+								  #{empeeAcct},
+								  #{userName},
+								  #{fileId},
+								  #{fileName},
+								  #{parentId},
+								  #{destPath},
+								  #{approver},
+								  #{status},
+								  #{time}
+								  )
+	</insert>
+
+	<select id="getInfoById" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select file_id,file_name,FILE_SYS,file_path,file_parent,file_size,file_creation_date,file_modification_date,file_type,
+		group_id,group_level,org_id
+		from CTDFS_ORG_FILE
+		where file_id = #{fileId}
+ 	</select>
+ 	
+ 	<select id="getFileByParent" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select file_id,file_name,file_path,file_parent,file_size,file_creation_date,file_modification_date,file_type,
+		group_id,group_level,org_id
+		from CTDFS_ORG_FILE
+		where file_parent = #{fileId}
+ 	</select>
+ 	
+ 	<select id="getAuditedInfo" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select fk_file,file_name,path_name,review_status,review_time
+		from CTDFS_AUDIT
+		where fk_applicant = #{userId}
+ 	</select>
+ 	
+ 	<select id="getAuditInfo" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select audit_id,fk_file,file_name,path_name,review_status,review_time
+		from CTDFS_AUDIT
+		where FK_APPROVER = #{userId} order by REVIEW_TIME desc
+ 	</select>
+ 	
+ 	<update id="updateAuditState" parameterType="java.util.HashMap" >
+	   update CTDFS_AUDIT set REVIEW_STATUS=#{state}
+	   where AUDIT_ID=#{reviewId} and REVIEW_STATUS=0
+	</update>
+	
+	<update id="updateState" parameterType="java.util.HashMap" >
+	   update CTDFS_ORG_FILE set FILE_STATUS=#{state}
+	   where FILE_ID=#{fileId}
+	</update>
+	
+	<select id="getRelationByUser" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select PERMISSION_LEVEL
+		from USER_FILE
+		where FK_FILE = #{fileId} ane FK_USER = #{ownerId}
+ 	</select>
+ 	
+ 	<select id="getRelationByGroup" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select PERMISSION_LEVEL
+		from GROUP_FILE
+		where FK_FILE = #{fileGroupId} and FK_USER in
+		(select DEPARTMENT_ID from department where staff_id = #{ownerId})
+		FK_USER = #{ownerId}
+ 	</select>
+
+	<select id="getFileByName" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select *
+		from CTDFS_ORG_FILE
+		where file_name = #{fileName} and file_parent = #{parentId}
+ 	</select>
+ 	
+ 	<select id="getReviewerByFile" parameterType="java.util.HashMap" resultType="java.lang.Integer" >
+		select FK_USER
+		from CTDFS_ORG_FILE_REL
+		where fk_file = #{groupId} and permission_level = 4 and user_type = 2
+ 	</select>
+ 	
+ 	<delete id="deleteFile" parameterType="java.util.HashMap">
+  		delete from CTDFS_ORG_FILE where file_id = #{fileId}
+	</delete>
+	
+	<select id="getOrgAccess" parameterType="java.util.HashMap" resultType="java.lang.Integer" >
+		select PERMISSION_LEVEL
+		from CTDFS_ORG_FILE_REL a,CTDFS_USER_ORG_REL b
+		where a.fk_file = #{fileId} and b.staff_id = #{userId} and a.fk_user = b.org_id and a.user_type = 1
+ 	</select>
+ 	
+ 	<select id="getStaffAccess" parameterType="java.util.HashMap" resultType="java.lang.Integer" >
+		select PERMISSION_LEVEL
+		from CTDFS_ORG_FILE_REL
+		where fk_file = #{fileId} and fk_user = #{userId} and user_type = 2
+ 	</select>
+ 	
+ 	<select id="getGroupAccess" parameterType="java.util.HashMap" resultType="java.lang.Integer" >
+		select PERMISSION_LEVEL
+		from CTDFS_ORG_FILE_REL
+		where fk_file = #{fileId} and fk_user = #{userId} and user_type = 3
+ 	</select>
+</mapper>

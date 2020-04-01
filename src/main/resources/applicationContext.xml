@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd 
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd 
+	http://www.springframework.org/schema/tx  
+	http://www.springframework.org/schema/tx/spring-tx-3.0.xsd 
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/task
+    http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+	
+	<!-- 对包中的所有类进行扫描，以完成Bean创建和自动依赖注入的功能 -->
+	
+	<aop:aspectj-autoproxy expose-proxy="true"/>
+	<!-- 加载数据源配置文件 -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <!-- 标准配置 -->
+                <value>classpath:/config/oracle.properties</value>
+            </list>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+    </bean>	
+	<bean id="dbcpConnectionProxy" class="com.chinatelecom.udp.core.dataaccess.proxy.DriverConnectionFactoryInject"></bean>      
+   <bean name="dataSource_platform" class="org.apache.tomcat.jdbc.pool.DataSource">
+	     <property name="url" value="jdbc:oracle:thin:@${ds.oracle.host}:${ds.oracle.port}:${ds.oracle.db}" />
+	    <!--  <property name="url" value="jdbc:oracle:thin:@134.64.39.252:20002:gzst" /> -->
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+        <property name="username"><value>${ds.oracle.username}</value></property>
+		  <property name="password"><value>${ds.oracle.password}</value></property>
+		  <property name="testWhileIdle"><value>true</value></property>
+		  <property name="validationInterval"><value>60000</value></property>
+		  <property name="validationQuery"><value>select 1 from dual</value></property>
+		  <property name="testOnBorrow"><value>true</value></property>
+		  <property name="initialSize" value="50"/>  
+		  <property name="maxIdle" value="20"/>  
+		  <property name="minIdle" value="5"/>  
+		  <property name="maxActive" value="100"/>  
+		  <property name="logValidationErrors" value="true"/>
+		  <property name="removeAbandoned" value="true"/>
+		  <property name="removeAbandonedTimeout" value="120000"/>
+		  <property name="logAbandoned" value="true"/>
+		  <property name="suspectTimeout" value="30000"/>
+    </bean>
+    <bean id="connectionFactory" class="com.chinatelecom.udp.core.dataaccess.database.ConnectionFactory">
+       <property name="DataSource">  
+           <map>  
+               <entry key="platform" value-ref="dataSource_platform">  
+               </entry>
+           </map>  
+       </property> 
+   </bean>
+	<!-- 配置事务管理器 -->
+	<tx:annotation-driven/>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource_platform" />
+		<qualifier value="platform"/>
+	</bean>
+	
+	<aop:config proxy-target-class="true"/>
+	
+	<bean id="sqlSessionFactory_oracle" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource_platform" />
+		<!-- configLocation：用于指定Mybatis的配置文件位置 -->
+		<property name="configLocation" value="classpath:/mybatis.xml" />
+		<!-- mapper和resultmap配置路径 -->
+	    <property name="mapperLocations"> 
+			<list>
+				<value>classpath*:com/chinatelecom/ctdfs/**/dao/*.xml</value>
+				<!-- <value>classpath*:com/ahtelecom/comm/**/dao/*.xml</value> -->
+			</list>
+		</property>
+	</bean>	
+	<!-- 
+	自动扫描和注册Mapper接口basePackage是用来指定Mapper接口文件所在的基包，
+	在这个基包或其所有子包下面的Mapper接口都将被搜索到。多个基包之间可以使用逗号或者分号进行分隔
+	-->
+	<bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="
+		com.chinatelecom.ctdfs.**.mapper
+		" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory_oracle" />
+	</bean>	
+	
+	<!-- 配置SqlSessionTemplate -->
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
+		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory_oracle" />
+	</bean>
+	
+	<context:annotation-config/>
+	
+	<task:annotation-driven/>
+	<!-- 配置用于从服务端更新静态对象的任务等 -->
+   <bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+	<property name="quartzProperties">
+			<props>
+				<prop key="org.quartz.threadPool.threadCount">2</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate"  scope="prototype"> 
+		<constructor-arg index="0" ref="sqlSessionFactory_oracle"/>  
+	</bean>
+	
+	<bean id="sqlMapper" class="com.github.abel533.sql.SqlMapper" scope="prototype">
+		<constructor-arg ref="sqlSession"/>
+	</bean>
+	
+	<bean id="SpringContextUtil" class="com.chinatelecom.ctdfs.util.SpringContextUtil" scope="singleton"></bean> 
+	
+	<context:component-scan base-package="com.chinatelecom.platform com.chinatelecom.udp com.chinatelecom.cloudoffice com.chinatelecom.ctdfs"/>    
+</beans>
