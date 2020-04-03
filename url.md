@@ -304,3 +304,143 @@ url:"/renamePersonalFile"
   "fileName":"rename.pdf"
 }
 ```
+
+7、删除文件至回收站
+
+url:"/deletePersonalFile"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+  "fileId":string   //文件id
+}
+```
+
+**出参**
+
+正常：
+```
+{
+  "content": "{
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"
+  }",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+**测试数据**
+```
+{
+  "id":8556016,
+  "fileId":"6D73EFB450BB4F3E9B2C50D3D330F007"
+}
+```
+
+8、查看回收站
+
+url:"/listRecycler"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+}
+```
+
+**出参**
+
+正常：
+```
+{
+  "content": "{
+    \"fileInfo\":[
+      {\"FILE_SIZE\":\"188885\",\"FILE_CREATION_DATE\":\"2020-04-02 00:27:48\",
+      \"FILE_PARENT\":\"8556016\",\"FILE_ID\":\"6D73EFB450BB4F3E9B2C50D3D330F007\",
+      \"FILE_TYPE\":\"pdf\",\"FILE_NAME\":\"rename.pdf\",\"FILE_MODIFICATION_DATE\":\"2020-04-02 01:55:39\"},
+      {\"FILE_SIZE\":\"0\",\"FILE_CREATION_DATE\":\"2020-04-02 00:28:05\",
+      \"FILE_PARENT\":\"8556016\",\"FILE_ID\":\"0CB40286BB2745108F5D1116EFD65D21\",
+      \"FILE_NAME\":\"新文件夹\",\"FILE_MODIFICATION_DATE\":\"2020-04-02 02:06:29\"}],
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"
+  }",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+**测试数据**
+```
+{
+  "id":8556016
+}
+```
+
+9、回收站复原
+
+url:"/restoreRecycler"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+  "fileId":string  //文件id
+  "parentId":string  //父文件id
+}
+```
+
+**出参**
+
+正常：
+```
+{
+  {
+  "content": "{
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"
+  }",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+}
+```
+
+未完成的功能：
+文件夹和文件单独删除，文件夹彻底删除，文件复原（根据路径生成新的文件夹）
+文件夹回收站，原文件新建同名文件夹，还原后自动合并
+
+
+10、回收站彻底删除
+
+url:"/deleteRecycler"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+  "fileId":string  //文件id
+  "status":int  //文件状态
+}
+```
+
+**出参**
+
+正常：
+```
+{
+  {
+  "content": "{
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"
+  }",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+}
+```

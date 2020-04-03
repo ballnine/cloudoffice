@@ -82,15 +82,15 @@ public class PersonalFileController {
 	
 	@RequestMapping("/deletePersonalFile")
 	@ResponseBody
-	public String deletePersonalFile(HttpServletRequest request, HttpServletResponse response) {
+	public DataOutputFormat deletePersonalFile(HttpServletRequest request, HttpServletResponse response) {
 		int user = Integer.parseInt(request.getParameter("id"));
 		String fileId = request.getParameter("fileId");
 		JSONObject parameters = new JSONObject();
 		parameters.put("empeeAcct", user);
 		parameters.put("fileId", fileId);
-		JSONObject result = personalFileService.deletePersonalFile(parameters,request);
+		DataOutputFormat result = personalFileService.deletePersonalFile(parameters,request);
 		String message = result.toString();
-		return message;
+		return result;
 	}
 	
 	@RequestMapping("/addPersonalFolder")
@@ -110,18 +110,18 @@ public class PersonalFileController {
 	
 	@RequestMapping("/listRecycler")
 	@ResponseBody
-	public String getRecycler(HttpServletRequest request, HttpServletResponse response) {
+	public DataOutputFormat getRecycler(HttpServletRequest request, HttpServletResponse response) {
 		int user = Integer.parseInt(request.getParameter("id"));
 		JSONObject parameters = new JSONObject();
 		parameters.put("empeeAcct", user);
-		JSONObject result = personalFileService.getRecycler(parameters,request);
+		DataOutputFormat result = personalFileService.getRecycler(parameters,request);
 		String message = result.toString();
-		return message;
+		return result;
 	}
 	
 	@RequestMapping("/deleteRecycler")
 	@ResponseBody
-	public String deleteRecycler(HttpServletRequest request, HttpServletResponse response) {
+	public DataOutputFormat deleteRecycler(HttpServletRequest request, HttpServletResponse response) {
 		int user = Integer.parseInt(request.getParameter("id"));
 		String fileId = request.getParameter("fileId");
 		int status = Integer.parseInt(request.getParameter("status"));
@@ -129,14 +129,14 @@ public class PersonalFileController {
 		parameters.put("empeeAcct", user);
 		parameters.put("fileId", fileId);
 		parameters.put("status", status);
-		JSONObject result = personalFileService.deleteRecycler(parameters,request);
+		DataOutputFormat result = personalFileService.deleteRecycler(parameters,request);
 		String message = result.toString();
-		return message;
+		return result;
 	}
 	
 	@RequestMapping("/restoreRecycler")
 	@ResponseBody
-	public String restoreRecycler(HttpServletRequest request, HttpServletResponse response) {
+	public DataOutputFormat restoreRecycler(HttpServletRequest request, HttpServletResponse response) {
 		int user = Integer.parseInt(request.getParameter("id"));
 		String fileId = request.getParameter("fileId");
 		String parentId = request.getParameter("parentId");
@@ -144,9 +144,9 @@ public class PersonalFileController {
 		parameters.put("empeeAcct", user);
 		parameters.put("fileId", fileId);
 		parameters.put("parentId", parentId);
-		JSONObject result = personalFileService.restoreRecycler(parameters,request);
+		DataOutputFormat result = personalFileService.restoreRecycler(parameters,request);
 		String message = result.toString();
-		return message;
+		return result;
 	}
 	
 	@RequestMapping("/renamePersonalFile")

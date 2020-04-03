@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -474,7 +475,7 @@ public class PersonalFileService implements IWorkService{
 	 * @return
 	 */
 	@MatchMethod(matchPostfix = "login")
-	public JSONObject deletePersonalFile(JSONObject parameters, HttpServletRequest request) {
+	public DataOutputFormat deletePersonalFile(JSONObject parameters, HttpServletRequest request) {
 		DataOutputFormat result = new DataOutputFormat();
 		JSONObject resultJson = new JSONObject();
 		int flag = 0;//记录是否修改成功
@@ -486,7 +487,7 @@ public class PersonalFileService implements IWorkService{
 				resultJson.put(RetCode.RESULT_KEY, RetCode.ERROR_CODE_11);
 				resultJson.put(RetCode.RESULT_VALUE,RetCode.ERROR_DESC_11);
 				result.setJSON(resultJson);
-				return resultJson;
+				return result;
 			}
 			
 			if(!fileId.isEmpty()) {
@@ -513,25 +514,25 @@ public class PersonalFileService implements IWorkService{
 	            	resultJson.put(RetCode.RESULT_KEY, RetCode.SUCCESS);
 	    			resultJson.put(RetCode.RESULT_VALUE,RetCode.SUCCESS_MSG);
 	                result.setJSON(resultJson);
-	                return resultJson;
+	                return result;
 	            }
 			} else {
 				resultJson.put(RetCode.RESULT_KEY, RetCode.ERROR_CODE_12);
 				resultJson.put(RetCode.RESULT_VALUE,RetCode.ERROR_DESC_12);
 				result.setJSON(resultJson);
-				return resultJson;
+				return result;
 			}
 		} catch (Exception e) {
 			resultJson.put(RetCode.RESULT_KEY, RetCode.FAIL);
 			resultJson.put(RetCode.RESULT_VALUE, RetCode.FAIL_MSG + e.getMessage());
 			result.setJSON(resultJson);
 			log.error(e.getMessage(), e);
-			return resultJson;
+			return result;
 		}
 		resultJson.put(RetCode.RESULT_KEY, RetCode.FAIL);
 		resultJson.put(RetCode.RESULT_VALUE, RetCode.FAIL_MSG);
 		result.setJSON(resultJson);
-		return resultJson;
+		return result;
 	}
 	
 	/**
@@ -541,7 +542,7 @@ public class PersonalFileService implements IWorkService{
 	 * @return
 	 */
 	@MatchMethod(matchPostfix = "login")
-	public JSONObject getRecycler(JSONObject parameters, HttpServletRequest request) {
+	public DataOutputFormat getRecycler(JSONObject parameters, HttpServletRequest request) {
 		DataOutputFormat result = new DataOutputFormat();
 		JSONObject resultJson = new JSONObject();
 		try {
@@ -551,7 +552,7 @@ public class PersonalFileService implements IWorkService{
 				resultJson.put(RetCode.RESULT_KEY, RetCode.ERROR_CODE_11);
 				resultJson.put(RetCode.RESULT_VALUE,RetCode.ERROR_DESC_11);
 				result.setJSON(resultJson);
-				return resultJson;
+				return result;
 			}
 			
 			HashMap<String, Object> paraMap = new HashMap<String, Object>();
@@ -562,19 +563,19 @@ public class PersonalFileService implements IWorkService{
     			resultJson.put(RetCode.RESULT_VALUE,RetCode.SUCCESS_MSG);
                 resultJson.put("fileInfo", fileInfo);
                 result.setJSON(resultJson);
-                return resultJson;
+                return result;
             }
 		} catch (Exception e) {
 			resultJson.put(RetCode.RESULT_KEY, RetCode.FAIL);
 			resultJson.put(RetCode.RESULT_VALUE, RetCode.FAIL_MSG + e.getMessage());
 			result.setJSON(resultJson);
 			log.error(e.getMessage(), e);
-			return resultJson;
+			return result;
 		}
 		resultJson.put(RetCode.RESULT_KEY, RetCode.FAIL);
 		resultJson.put(RetCode.RESULT_VALUE, RetCode.FAIL_MSG);
 		result.setJSON(resultJson);
-		return resultJson;
+		return result;
 	}
 	
 	/**
@@ -584,7 +585,7 @@ public class PersonalFileService implements IWorkService{
 	 * @return
 	 */
 	@MatchMethod(matchPostfix = "login")
-	public JSONObject deleteRecycler(JSONObject parameters, HttpServletRequest request) {
+	public DataOutputFormat deleteRecycler(JSONObject parameters, HttpServletRequest request) {
 		DataOutputFormat result = new DataOutputFormat();
 		JSONObject resultJson = new JSONObject();
 		try {
@@ -598,7 +599,7 @@ public class PersonalFileService implements IWorkService{
 				resultJson.put(RetCode.RESULT_KEY, RetCode.ERROR_CODE_11);
 				resultJson.put(RetCode.RESULT_VALUE,RetCode.ERROR_DESC_11);
 				result.setJSON(resultJson);
-				return resultJson;
+				return result;
 			}		
 				
 			if(fileId!=null) {
@@ -606,7 +607,7 @@ public class PersonalFileService implements IWorkService{
 				List<String> idStrListUp = new ArrayList<String>();
 				List<String> subfileDel = getSublist(fileId,3,id);//获取回收站可彻底删除的文件子列表
 				List<String> subfileUp = getSublist(fileId,4,id);//获取回收站状态变为1的文件子列表
-				if (statusItem == 4 || statusItem == 5) {//处理父文件
+				if (statusItem == 4 || statusItem == 5) {//处理父文件,bug，若文件夹下仍有回收站文件错误
 					subfileUp.add(fileId);
 				} else {
 					subfileDel.add(fileId);
@@ -625,12 +626,23 @@ public class PersonalFileService implements IWorkService{
 	            		break;
 	            	}
 	            }
+				//Connection conn = SSHUtil.getSSHConnection("122.51.38.46",22,"root","Hudiewang$0","C:\\study\\rsy");
+				for (String file:idStrListDel) {
+					HashMap<String,Object> fileInfo = new HashMap<String, Object>();
+					HashMap<String,Object> params = new HashMap<String, Object>();
+					params.put("fileId", file);
+					params.put("ownerId", id);
+					fileInfo = personalFileMapper.getFileInfoById(params);
+					//TODO:服务器文件删除顺序，且文件夹若有其他文件不能删除
+	            	//SSHUtil.deleteFile(conn,fileInfo.get("FILE_SYS").toString());
+				}
 				personalFileMapper.deleteFile(idStrListDel);//彻底删除子文件
 				if (flag == 0) {
+					//conn.close();
 	            	resultJson.put(RetCode.RESULT_KEY, RetCode.SUCCESS);
 	    			resultJson.put(RetCode.RESULT_VALUE,RetCode.SUCCESS_MSG);
 	                result.setJSON(resultJson);
-	                return resultJson;
+	                return result;
 	            }
 			}
 		} catch (Exception e) {
@@ -638,12 +650,12 @@ public class PersonalFileService implements IWorkService{
 			resultJson.put(RetCode.RESULT_VALUE, RetCode.FAIL_MSG + e.getMessage());
 			result.setJSON(resultJson);
 			log.error(e.getMessage(), e);
-			return resultJson;
+			return result;
 		}
 		resultJson.put(RetCode.RESULT_KEY, RetCode.FAIL);
 		resultJson.put(RetCode.RESULT_VALUE, RetCode.FAIL_MSG);
 		result.setJSON(resultJson);
-		return resultJson;
+		return result;
 	}
 	
 	/**
@@ -653,7 +665,7 @@ public class PersonalFileService implements IWorkService{
 	 * @return
 	 */
 	@MatchMethod(matchPostfix = "login")
-	public JSONObject restoreRecycler(JSONObject parameters, HttpServletRequest request) {
+	public DataOutputFormat restoreRecycler(JSONObject parameters, HttpServletRequest request) {
 		DataOutputFormat result = new DataOutputFormat();
 		JSONObject resultJson = new JSONObject();
 		int flag = 0;//记录是否修改成功
@@ -666,7 +678,7 @@ public class PersonalFileService implements IWorkService{
 				resultJson.put(RetCode.RESULT_KEY, RetCode.ERROR_CODE_11);
 				resultJson.put(RetCode.RESULT_VALUE,RetCode.ERROR_DESC_11);
 				result.setJSON(resultJson);
-				return resultJson;
+				return result;
 			}		
 			
 			HashMap<String, Object> paraMap = new HashMap<String, Object>();
@@ -677,14 +689,12 @@ public class PersonalFileService implements IWorkService{
 			
 			//TODO:若原文件有同名，直接合并
 			//TODO:若父文件已删除，新建文件
-			if (!parentId.equals("~") && parent == null) {
+			if (parent.size() == 0) {
 				//TODO:新建父文件
 			}
-			int fileStatue = 0;
-			if (!parentId.equals("~")) {
-				fileStatue = (int)parent.get("FILE_STATUS");
-			}
-			while (!parentId.equals("~") && fileStatue != 1 && fileStatue != 4) {
+			BigDecimal bigDecimal = (BigDecimal) parent.get("FILE_STATUS");
+			int fileStatue = Integer.parseInt(bigDecimal.toString());
+			while (!parentId.equals(String.valueOf(id)) && fileStatue != 1 && fileStatue != 4) {
 				//父文件也被删除，修改父文件列表状态为4或5,否则直接还原文件，不用对父文件操作
 				//判断父文件状态位是2，修改为4，状态位是3，修改为5
 				if (fileStatue == 2) {
@@ -701,7 +711,7 @@ public class PersonalFileService implements IWorkService{
 				parentId = parent.get("FILE_PARENT").toString();
 				paraMap.put("parentId", parentId);
 				parent = personalFileMapper.getParentById(paraMap);
-				if (!parentId.equals("~")) {
+				if (!parentId.equals(String.valueOf(id))) {
 					fileStatue = (int)parent.get("FILE_STATUS");
 				}
 			}
@@ -709,7 +719,7 @@ public class PersonalFileService implements IWorkService{
 				resultJson.put(RetCode.RESULT_KEY, RetCode.ERROR_CODE_13);
 				resultJson.put(RetCode.RESULT_VALUE, RetCode.ERROR_DESC_13);
 				result.setJSON(resultJson);
-				return resultJson;
+				return result;
             }
 			
 			//子文件状态，若状态不为2，修改为1
@@ -728,19 +738,19 @@ public class PersonalFileService implements IWorkService{
             	resultJson.put(RetCode.RESULT_KEY, RetCode.SUCCESS);
     			resultJson.put(RetCode.RESULT_VALUE,RetCode.SUCCESS_MSG);
                 result.setJSON(resultJson);
-                return resultJson;
+                return result;
             }
 		} catch (Exception e) {
 			resultJson.put(RetCode.RESULT_KEY, RetCode.FAIL);
 			resultJson.put(RetCode.RESULT_VALUE, RetCode.FAIL_MSG + e.getMessage());
 			result.setJSON(resultJson);
 			log.error(e.getMessage(), e);
-			return resultJson;
+			return result;
 		}
 		resultJson.put(RetCode.RESULT_KEY, RetCode.FAIL);
 		resultJson.put(RetCode.RESULT_VALUE, RetCode.FAIL_MSG);
 		result.setJSON(resultJson);
-		return resultJson;
+		return result;
 	}
 	
 	/**
