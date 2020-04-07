@@ -58,7 +58,20 @@
         "uploader":"normalUploader",
         "access":3
     },
+    "addDepartmentFolder":{
+        "validator":{
+            "type":["Org","Staff"]
+        },
+        "uploader":"normalUploader",
+        "access":3
+    },
     "listDepartmentFile":{
+        "validator":{
+            "type":["Org","Staff"]
+        },
+        "access":1
+    },
+    "listOrgFileInfo":{
         "validator":{
             "type":["Org","Staff"]
         },
@@ -70,17 +83,17 @@
         },
         "access":1
     },
+    "renameOrgFile":{
+        "validator":{
+            "type":["Org","Staff"]
+        },
+        "access":3
+    },
     "addAuditOrgFile":{
         "validator":{
             "type":["Org","Staff"]
         },
         "access":2
-    },
-    "listAuditFile":{
-        "validator":{
-            "type":["Org","Staff"]
-        },
-        "access":4
     },
     "auditFile":{
         "validator":{

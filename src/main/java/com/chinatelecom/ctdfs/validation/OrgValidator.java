@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,7 +24,7 @@ import com.chinatelecom.ctdfs.util.SpringContextUtil;
 import com.chinatelecom.udp.core.lang.json.JSONObject;
 import com.chinatelecom.udp.core.lang.text.TextHelper;
 
-public class StaffValidator implements IValidator{
+public class OrgValidator implements IValidator{
 	private CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
 
 	@Override
@@ -91,7 +92,7 @@ public class StaffValidator implements IValidator{
 		HashMap<String, Object> paraMap = new HashMap<String, Object>();
 		paraMap.put("userId", user);
 		paraMap.put("fileId", groupId);
-		int level = orgFileService.getStaffAccess(paraMap);
+		int level = orgFileService.getOrgAccess(paraMap);
 		int accessLevel = 0;
 		
 		if (config.getJSONObject(requestName) != null) {

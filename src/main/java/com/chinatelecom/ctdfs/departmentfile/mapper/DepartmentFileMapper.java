@@ -30,9 +30,11 @@ public interface DepartmentFileMapper {
 	
 	void deleteFile(HashMap<String, Object> paraMap);
 	
-	int getOrgAccess(HashMap<String, Object> paraMap);
+	HashMap<String, Object> getOrgAccess(HashMap<String, Object> paraMap);
 	
-	int getStaffAccess(HashMap<String, Object> paraMap);
+	HashMap<String, Object> getStaffAccess(HashMap<String, Object> paraMap);
 	
-	int getGroupAccess(HashMap<String, Object> paraMap);
+	HashMap<String, Object> getGroupAccess(HashMap<String, Object> paraMap);
+
+	int updateFileName(HashMap<String, Object> paraMap);
 }

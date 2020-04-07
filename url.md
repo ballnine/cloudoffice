@@ -398,7 +398,6 @@ url:"/restoreRecycler"
 正常：
 ```
 {
-  {
   "content": "{
     \"retCode\":\"1\",
     \"retMsg\":\"成功！\"
@@ -406,7 +405,6 @@ url:"/restoreRecycler"
   "contentIsJson": true,
   "reqeustSerial": 0,
   "result": 0
-}
 }
 ```
 
@@ -433,7 +431,6 @@ url:"/deleteRecycler"
 正常：
 ```
 {
-  {
   "content": "{
     \"retCode\":\"1\",
     \"retMsg\":\"成功！\"
@@ -442,5 +439,373 @@ url:"/deleteRecycler"
   "reqeustSerial": 0,
   "result": 0
 }
+```
+
+## 部门网盘部分
+
+1、添加部门文件
+
+url:"/addDepartmentFile"
+
+**入参**：multipart/form-data
+```
+{
+  "empeeAcct":int   //员工id
+  "parentId":string   //父文件id
+  "file":    //上传文件
+  "fileName":    //文件名
+  "groupId":     //目标组织父文件ID
+}
+```
+
+**出参**
+
+正常：
+```
+{
+  "content": "{
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"
+  }",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+目标文件夹已有同名文件：
+```
+{
+  "content":"{
+     \"retCode\":\"20\",
+     \"retMsg\":\"目标文件重名\"
+  }"
+}
+```
+
+无上传文件：
+```
+{
+  "content":"{
+     \"retCode\":\"17\",
+     \"retMsg\":\"上传文件格式错误\"
+  }"
+}
+```
+
+2、显示部门文件列表
+
+url:"/listDepartmentFile"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+  "parentId":string   //父文件id
+  "groupId":     //目标组织父文件ID
+}
+```
+
+**出参**
+
+正常：
+```
+{
+ "content": 
+    "{\"fileInfo\":
+        [{\"GROUP_LEVEL\":1,
+        \"FILE_SIZE\":0,\"FILE_CREATION_DATE\":\"2020-04-05 23:40:14\",
+        \"ORG_ID\":510067614,\"FILE_PARENT\":\"H1110002\",\"FILE_ID\":\"9E392527B0884C849C810264DD4BCF58\",
+        \"FILE_PATH\":\"~\\\\省企业信息化部\\\\自主开发团队\",
+        \"FILE_NAME\":\"新文件夹\",\"FILE_MODIFICATION_DATE\":\"2020-04-05 23:41:44\",
+        \"GROUP_ID\":\"H1110002\"},{\"GROUP_LEVEL\":1,
+        \"FILE_SIZE\":1625047,\"FILE_CREATION_DATE\":\"2020-04-04 23:34:40\",
+        \"ORG_ID\":510067614,\"FILE_PARENT\":\"H1110002\",\"FILE_ID\":\"6D036C1831584B8E93185442FE1CCD41\",
+        \"FILE_TYPE\":\"docx\",\"FILE_PATH\":\"~\\\\省企业信息化部\\\\自主开发团队\",\"FILE_NAME\":\"rename.docx\",\"FILE_MODIFICATION_DATE\":\"2020-04-04 23:34:40\",
+        \"GROUP_ID\":\"H1110002\"}],
+      \"retCode\":\"1\",
+      \"retMsg\":\"成功！\"}",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+3、新建部门文件夹
+
+url:"/addDepartmentFolder"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+  "parentId":string   //父文件id
+  "fileName":    //文件夹名
+  "groupId":     //目标组织父文件ID
+}
+```
+
+**出参**
+
+正常：
+```
+{
+  "content": "{
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"
+  }",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+目标文件夹已有同名文件：
+```
+{
+  "content":"{
+     \"retCode\":\"20\",
+     \"retMsg\":\"目标文件重名\"
+  }"
+}
+```
+
+4、下载部门文件
+
+url:"/downloadDepartmentFile"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+  "fileId":string   //文件id
+  "localPath":    //下载本地目标地址
+  "groupId":     //目标组织父文件ID
+}
+```
+
+**出参**
+
+正常：
+```
+{
+  "content": "{
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"
+  }",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+5、显示文件详细信息
+
+url:"/listOrgFileInfo"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+  "fileId":string   //文件id
+  "groupId":     //目标组织父文件ID
+}
+```
+
+**出参**
+
+正常：
+```
+{
+  "content": "{
+    \"fileInfo\":
+      {\"GROUP_LEVEL\":1,
+      \"FILE_SIZE\":1625047,
+      \"ORG_ID\":510067614,\"FILE_DFSNAME\":\"rename.docx\",\"FILE_PARENT\":\"H1110002\",\"FILE_SYS\":\"/home/disk/public/files/org/省企业信息化部/自主开发团队/rename.docx\",\"FILE_ID\":\"6D036C1831584B8E93185442FE1CCD41\",
+      \"FILE_TYPE\":\"docx\",\"FILE_PATH\":\"~\\\\省企业信息化部\\\\自主开发团队\",
+      \"FILE_NAME\":\"rename.docx\",\"FILE_MODIFICATION_DATE\":\"2020-04-04 23:34:40\",
+      \"GROUP_ID\":\"H1110002\"},
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"}",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+6、部门文件重命名
+
+url:"/renameOrgFile"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+  "fileId":string   //文件id
+  "fileName":    //重命名名称
+  "groupId":     //目标组织父文件ID
+}
+```
+
+**出参**
+
+正常：
+```
+{
+  "content": "{
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"
+  }",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+目标文件夹已有同名文件：
+```
+{
+  "content":"{
+     \"retCode\":\"20\",
+     \"retMsg\":\"目标文件重名\"
+  }"
+}
+```
+
+7、添加需审核文件
+
+url:"/addAuditOrgFile"
+
+**入参**：multipart/form-data
+```
+{
+  "empeeAcct":int   //员工id
+  "parentId":string   //父文件id
+  "file":    //上传文件
+  "fileName":    //文件名
+  "groupId":     //目标组织父文件ID
+}
+```
+
+**出参**
+
+正常：
+```
+{
+  "content": "{
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"
+  }",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+目标文件夹已有同名文件：
+```
+{
+  "content":"{
+     \"retCode\":\"20\",
+     \"retMsg\":\"目标文件重名\"
+  }"
+}
+```
+
+无上传文件：
+```
+{
+  "content":"{
+     \"retCode\":\"17\",
+     \"retMsg\":\"上传文件格式错误\"
+  }"
+}
+```
+
+8、显示被审核文件列表
+
+url:"/listAuditedFile"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+}
+```
+
+**出参**
+
+正常：
+```
+{
+   "content": 
+      "{\"auditInfo\":[{\"REVIEW_TIME\":\"2020-04-07 17:26:37\",\"PATH_NAME\":\"~\\\\省企业信息化部\\\\IT规划与架构团队\",\"FK_FILE\":\"F7D5B8D908FE4C4FA0BE9C330A234484\",
+      \"FILE_NAME\":\"饶诗语个人简介.pdf\",\"REVIEW_STATUS\":0},{\"REVIEW_TIME\":\"2020-04-07 17:08:58\",\"PATH_NAME\":\"~\\\\省企业信息化部\\\\IT规划与架构团队\",\"FK_FILE\":\"4A19600F23AE436BBFC0FDEF1A31B830\",
+      \"FILE_NAME\":\"饶诗语个人简介.pdf\",\"REVIEW_STATUS\":2}],
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"}",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+9、显示审核文件列表
+
+url:"/listAuditFile"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+}
+```
+
+**出参**
+
+正常：
+```
+{
+   "content": 
+      "{\"auditInfo\":[{\"REVIEW_TIME\":\"2020-04-07 17:26:37\",\"PATH_NAME\":\"~\\\\省企业信息化部\\\\IT规划与架构团队\",\"FK_FILE\":\"F7D5B8D908FE4C4FA0BE9C330A234484\",
+      \"FILE_NAME\":\"饶诗语个人简介.pdf\",\"REVIEW_STATUS\":0},{\"REVIEW_TIME\":\"2020-04-07 17:08:58\",\"PATH_NAME\":\"~\\\\省企业信息化部\\\\IT规划与架构团队\",\"FK_FILE\":\"4A19600F23AE436BBFC0FDEF1A31B830\",
+      \"FILE_NAME\":\"饶诗语个人简介.pdf\",\"REVIEW_STATUS\":2}],
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"}",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+10、审核文件
+
+url:"/auditFile"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+  "fileId":string    //文件id
+  "state":int        //审核结果（1通过2拒绝）
+  "auditId":string   //审核项id
+  "groupId":string   //目标文件父组织id
+}
+```
+
+**出参**
+
+正常：
+```
+{
+   "content": 
+      "{\"auditInfo\":[{\"REVIEW_TIME\":\"2020-04-07 17:26:37\",\"PATH_NAME\":\"~\\\\省企业信息化部\\\\IT规划与架构团队\",\"FK_FILE\":\"F7D5B8D908FE4C4FA0BE9C330A234484\",
+      \"FILE_NAME\":\"饶诗语个人简介.pdf\",\"REVIEW_STATUS\":0},{\"REVIEW_TIME\":\"2020-04-07 17:08:58\",\"PATH_NAME\":\"~\\\\省企业信息化部\\\\IT规划与架构团队\",\"FK_FILE\":\"4A19600F23AE436BBFC0FDEF1A31B830\",
+      \"FILE_NAME\":\"饶诗语个人简介.pdf\",\"REVIEW_STATUS\":2}],
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"}",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
 }
 ```
