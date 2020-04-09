@@ -72,10 +72,12 @@
  	</select>
  	
  	<select id="getFileByParent" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
-		select file_id,file_name,file_path,file_parent,file_size,file_creation_date,file_modification_date,file_type,
-		group_id,group_level,org_id
-		from CTDFS_ORG_FILE
-		where file_parent = #{fileId}
+		select file_id,file_name,file_path,file_parent,file_size,file_creation_date,file_modification_date,a.file_type,
+    	group_id,group_level,org_id,c.collection_date
+    	from CTDFS_ORG_FILE a
+    	left join ctdfs_favorites c 
+    	on a.file_id = c.fk_file and c.fk_empeeacct = #{userId}
+    	where a.file_parent = #{fileId}
  	</select>
  	
  	<update id="updateFileName" parameterType="java.util.HashMap" >

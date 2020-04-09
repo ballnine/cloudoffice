@@ -2,7 +2,6 @@ package com.chinatelecom.ctdfs.departmentfile.service;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -14,10 +13,6 @@ import java.util.UUID;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -27,7 +22,6 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.chinatelecom.ctdfs.common.service.WorkSmartCommonService;
 import com.chinatelecom.ctdfs.departmentfile.mapper.DepartmentFileMapper;
-import com.chinatelecom.ctdfs.personalfile.mapper.PersonalFileMapper;
 import com.chinatelecom.ctdfs.personalfile.service.PersonalFileService;
 import com.chinatelecom.ctdfs.util.RetCode;
 import com.chinatelecom.ctdfs.util.SSHUtil;
@@ -38,11 +32,8 @@ import com.chinatelecom.udp.core.datarouter.exception.DataException;
 import com.chinatelecom.udp.core.datarouter.io.DataOutputFormat;
 import com.chinatelecom.udp.core.datarouter.utils.TypeHttpRequest;
 import com.chinatelecom.udp.core.lang.json.JSONObject;
-import com.chinatelecom.udp.core.sharecontext.userrights.ILoginUserInfo;
 
 import ch.ethz.ssh2.Connection;
-import ch.ethz.ssh2.SCPClient;
-import ch.ethz.ssh2.SFTPv3Client;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -284,6 +275,7 @@ public class DepartmentFileService implements IWorkService{
 			if(!parentId.isEmpty()) {//TODO:首页面显示
 				HashMap<String, Object> paraMap = new HashMap<String, Object>();
 	            paraMap.put("fileId", parentId);
+	            paraMap.put("userId", id);
 	            
 	            List<HashMap<String, Object>> fileInfo = new ArrayList<HashMap<String, Object>>();
 	            HashMap<String,Object> parent = departmentFileMapper.getInfoById(paraMap);

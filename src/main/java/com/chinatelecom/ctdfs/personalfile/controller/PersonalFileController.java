@@ -22,7 +22,7 @@ public class PersonalFileController {
 	@Resource
     private PersonalFileService personalFileService;
 	
-	private static Logger log = LogManager.getLogger(UploadController.class.getName());
+	private static Logger log = LogManager.getLogger(PersonalFileController.class.getName());
 
 	@RequestMapping("/addPersonalFile")
 	@ResponseBody

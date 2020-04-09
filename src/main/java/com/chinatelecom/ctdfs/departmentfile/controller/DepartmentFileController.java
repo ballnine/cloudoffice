@@ -22,7 +22,7 @@ public class DepartmentFileController {
 	@Resource
 	private DepartmentFileService departmentFileService;
 	
-	private static Logger log = LogManager.getLogger(UploadController.class.getName());
+	private static Logger log = LogManager.getLogger(DepartmentFileController.class.getName());
 
 	@RequestMapping("/addDepartmentFile")
 	@ResponseBody

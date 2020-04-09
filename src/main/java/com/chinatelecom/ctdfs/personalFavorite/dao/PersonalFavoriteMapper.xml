@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinatelecom.ctdfs.personalFavorite.mapper.PersonalFavoriteMapper" >
+	<insert id="addFavorite" parameterType="java.util.HashMap">
+        insert into CTDFS_FAVORITES (FK_EMPEEACCT,
+        							FK_FILE,
+        							COLLECTION_DATE,
+        							FILE_TYPE) values(
+									#{userId},
+									#{fileId},
+									#{time},
+									#{type}
+									)
+	</insert>
+	
+	<update id="updateFavorite" parameterType="java.util.HashMap" >
+	   update CTDFS_FILEINFO t set 
+	   t.IS_FAVORITE=#{state}
+	   where t.file_id=#{fileId}
+	</update>
+	
+	<select id="getFavorite" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		select d.FK_FILE,d.COLLECTION_DATE,d.FILE_TYPE, 
+    		case  
+       			when d.file_type=1 then
+         			a.file_name 
+       			when d.file_type=2 then
+         			b.file_name
+    		end  fileName,
+    		case  
+       			when d.file_type=1 then
+         			a.file_size
+       			when d.file_type=2 then
+         			b.file_size
+    		end  fileSize,
+    		case  
+       			when d.file_type=1 then
+         			a.FILE_MODIFICATION_DATE
+       			when d.file_type=2 then
+         			b.FILE_MODIFICATION_DATE
+    		end  FILE_MODIFICATION_DATE,
+    		case  
+       			when d.file_type=1 then
+         			a.FILE_TYPE
+       			when d.file_type=2 then
+         			b.FILE_TYPE
+    		end  FILE_TYPE,
+    		case  
+       			when d.file_type=1 then
+         			a.FILE_STATUS
+       			when d.file_type=2 then
+         			b.FILE_STATUS
+    		end  FILE_STATUS,
+    		case  
+       			when d.file_type=1 then
+         			a.FILE_CLASS
+       			when d.file_type=2 then
+         			b.FILE_CLASS
+    		end  FILE_CLASS
+		from CTDFS_FAVORITES d 
+		left join CTDFS_FILEINFO a
+		on a.file_id=d.fk_file 
+		left join  CTDFS_ORG_FILE b
+		on b.file_id=d.fk_file
+		where d.fk_empeeacct = #{userId}
+ 	</select>
+ 	
+ 	<delete id="deleteFavorite" parameterType="java.util.HashMap">
+  		delete from CTDFS_FAVORITES where fk_file = #{fileId} and fk_empeeacct = #{userId}
+	</delete>
+</mapper>

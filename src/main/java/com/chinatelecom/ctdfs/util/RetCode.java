@@ -59,4 +59,7 @@ public class RetCode {
 	
 	public static final String ERROR_CODE_21 = "21";
 	public static final String ERROR_DESC_21 = "没有访问权限";
+	
+	public static final String ERROR_CODE_22 = "22";
+	public static final String ERROR_DESC_22 = "没有提供文件种类";
 }

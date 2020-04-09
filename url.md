@@ -116,13 +116,15 @@ url:"/listPersonalFile"
       \"FILE_PATH\":\"~\",\"FILE_NAME\":\"2019-7-14.docx\",\"FILE_OWNER\":8556010,\"FILE_CREATION_DATE\":\"2020-03-31 22:39:30\",
       \"FILE_DFSNAME\":\"temp\",\"FILE_STATUS\":1,
       \"FILE_CLASS\":1,
-      \"FILE_TYPE\":\"docx\",\"FILE_MODIFICATION_DATE\":\"2020-03-31 22:39:30\"},
+      \"FILE_TYPE\":\"docx\",\"FILE_MODIFICATION_DATE\":\"2020-03-31 22:39:30\",
+      \"IS_FACORITE\":1},
       {\"FILE_SIZE\":\"188885\",\"FILE_PARENT\":\"8556010\",\"FILE_SYS\":\"/home/disk/public/files/personal/8556010/饶诗语个人简介.pdf\",\"FILE_ID\":\"36880837E02D41618D4A6DC8D232566C\",
       \"FILE_PATH\":\"~\",
       \"FILE_NAME\":\"饶诗语个人简介.pdf\",\"FILE_OWNER\":8556010,\"FILE_CREATION_DATE\":\"2020-03-31 19:10:28\",
       \"FILE_DFSNAME\":\"temp\",\"FILE_STATUS\":1,
       \"FILE_CLASS\":1,
-      \"FILE_TYPE\":\"pdf\",\"FILE_MODIFICATION_DATE\":\"2020-03-31 19:10:28\"}],
+      \"FILE_TYPE\":\"pdf\",\"FILE_MODIFICATION_DATE\":\"2020-03-31 19:10:28\",
+      \"IS_FACORITE\":1}],
       \"retCode\":\"1\",
       \"retMsg\":\"成功！\"
   }"
@@ -196,7 +198,8 @@ url:"/listPersonalFileInfo"
     \"FILE_DFSNAME\":\"temp\",
     \"FILE_STATUS\":1,
     \"FILE_CLASS\":1,
-    \"FILE_TYPE\":\"docx\",\"FILE_MODIFICATION_DATE\":\"2020-03-31 22:39:30\"},
+    \"FILE_TYPE\":\"docx\",\"FILE_MODIFICATION_DATE\":\"2020-03-31 22:39:30\",
+    \"IS_FACORITE"\:1},
     \"retCode\":\"1\",
     \"retMsg\":\"成功！\"
   }"
@@ -509,22 +512,21 @@ url:"/listDepartmentFile"
 **出参**
 
 正常：
+若为收藏文件含有COLLECTION_DATE一项，为空则未收藏
 ```
 {
  "content": 
     "{\"fileInfo\":
-        [{\"GROUP_LEVEL\":1,
-        \"FILE_SIZE\":0,\"FILE_CREATION_DATE\":\"2020-04-05 23:40:14\",
+        [{\"GROUP_LEVEL\":1,\"FILE_SIZE\":\"1625047\",\"FILE_CREATION_DATE\":\"2020-04-04 23:34:40\",
+        \"ORG_ID\":510067614,\"FILE_PARENT\":\"H1110002\",\"COLLECTION_DATE\":\"2020-04-10 01:51:26\",\"FILE_ID\":\"6D036C1831584B8E93185442FE1CCD41\",
+        \"FILE_TYPE\":\"docx\",\"FILE_PATH\":\"~\\\\省企业信息化部\\\\自主开发团队\",\"FILE_NAME\":\"rename.docx\",\"FILE_MODIFICATION_DATE\":\"2020-04-04 23:34:40\",
+        \"GROUP_ID\":\"H1110002\"},{\"GROUP_LEVEL\":1,
+        \"FILE_SIZE\":\"0\",\"FILE_CREATION_DATE\":\"2020-04-05 23:40:14\",
         \"ORG_ID\":510067614,\"FILE_PARENT\":\"H1110002\",\"FILE_ID\":\"9E392527B0884C849C810264DD4BCF58\",
         \"FILE_PATH\":\"~\\\\省企业信息化部\\\\自主开发团队\",
         \"FILE_NAME\":\"新文件夹\",\"FILE_MODIFICATION_DATE\":\"2020-04-05 23:41:44\",
-        \"GROUP_ID\":\"H1110002\"},{\"GROUP_LEVEL\":1,
-        \"FILE_SIZE\":1625047,\"FILE_CREATION_DATE\":\"2020-04-04 23:34:40\",
-        \"ORG_ID\":510067614,\"FILE_PARENT\":\"H1110002\",\"FILE_ID\":\"6D036C1831584B8E93185442FE1CCD41\",
-        \"FILE_TYPE\":\"docx\",\"FILE_PATH\":\"~\\\\省企业信息化部\\\\自主开发团队\",\"FILE_NAME\":\"rename.docx\",\"FILE_MODIFICATION_DATE\":\"2020-04-04 23:34:40\",
-        \"GROUP_ID\":\"H1110002\"}],
-      \"retCode\":\"1\",
-      \"retMsg\":\"成功！\"}",
+        \"GROUP_ID\":\"H1110002\"}],\"retCode\":\"1\",
+        \"retMsg\":\"成功！\"}",
   "contentIsJson": true,
   "reqeustSerial": 0,
   "result": 0
@@ -624,7 +626,8 @@ url:"/listOrgFileInfo"
       \"ORG_ID\":510067614,\"FILE_DFSNAME\":\"rename.docx\",\"FILE_PARENT\":\"H1110002\",\"FILE_SYS\":\"/home/disk/public/files/org/省企业信息化部/自主开发团队/rename.docx\",\"FILE_ID\":\"6D036C1831584B8E93185442FE1CCD41\",
       \"FILE_TYPE\":\"docx\",\"FILE_PATH\":\"~\\\\省企业信息化部\\\\自主开发团队\",
       \"FILE_NAME\":\"rename.docx\",\"FILE_MODIFICATION_DATE\":\"2020-04-04 23:34:40\",
-      \"GROUP_ID\":\"H1110002\"},
+      \"GROUP_ID\":\"H1110002\",
+      \"IS_FACORITE"\:1},
     \"retCode\":\"1\",
     \"retMsg\":\"成功！\"}",
   "contentIsJson": true,
@@ -804,6 +807,122 @@ url:"/auditFile"
       \"FILE_NAME\":\"饶诗语个人简介.pdf\",\"REVIEW_STATUS\":2}],
     \"retCode\":\"1\",
     \"retMsg\":\"成功！\"}",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+## 通用部分
+
+1、收藏文件
+
+url:"/addFavoriteFile"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+  "fileId":string   //文件id
+  "type":int    //文件种类1个人文件夹2部门文件
+}
+```
+
+**出参**
+
+正常：
+```
+{
+  "content": "{
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"
+  }",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+type为空：
+```
+{
+  "content": "{
+    \"retCode\":\"22\",
+    \"retMsg\":\"没有提供文件种类\"
+  }",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+2、显示收藏文件
+
+url:"/listFavoriteFile"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+}
+```
+
+**出参**
+
+正常：
+根据文件状态（若为回收站中文件显示不同）
+```
+{
+    "content": "{
+      \"favoriteList\":[
+        {\"FILESIZE\":\"3\",\"COLLECTION_DATE\":\"2020-04-09 17:01:14\",
+        \"FILE_STATUS\":3,
+        \"FILE_CLASS\":1,
+        \"FILE_TYPE\":1,\"FK_FILE\":\"C127A24AA570417BB460D8582CE4643B\",
+        \"FILENAME\":\"test.txt\",\"FILE_MODIFICATION_DATE\":\"2020-04-05 23:19:59\"}],
+      \"retCode\":\"1\",
+      \"retMsg\":\"成功！\"}",
+    "contentIsJson": true,
+    "reqeustSerial": 0,
+    "result": 0
+}
+```
+
+3、取消收藏文件
+
+url:"/cancelFavoriteFile"
+
+**入参**：application/x-www-form-urlencoded
+```
+{
+  "id":int   //员工id
+  "fileId":string   //文件id
+  "type":int    //文件种类1个人文件夹2部门文件
+}
+```
+
+**出参**
+
+正常：
+```
+{
+  "content": "{
+    \"retCode\":\"1\",
+    \"retMsg\":\"成功！\"
+  }",
+  "contentIsJson": true,
+  "reqeustSerial": 0,
+  "result": 0
+}
+```
+
+type为空：
+```
+{
+  "content": "{
+    \"retCode\":\"22\",
+    \"retMsg\":\"没有提供文件种类\"
+  }",
   "contentIsJson": true,
   "reqeustSerial": 0,
   "result": 0
